@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="MYperiod is a free, private period tracker for iPhone. Your cycle data stays on your device: no accounts, no analytics, no tracking.">
+  <title>MYperiod · Private period tracker for iPhone</title>
+  <style>
+    :root {
+      --canvas: #ffffff;
+      --card: #f2f2f7;
+      --ink: #1c1c1e;
+      --slate: #6e6e73;
+      --rose: #c2255c;
+      --on-rose: #ffffff;
+      --rose-wash: #fdeef3;
+      --separator: #c6c6c8;
+      --phase-period: #f8c4cc;
+      --phase-follicular: #d3ebd4;
+      --phase-ovulation: #c9defb;
+      --phase-luteal: #fbe7bb;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --canvas: #000000;
+        --card: #1c1c1e;
+        --ink: #ffffff;
+        --slate: #98989f;
+        --rose: #ff5c8d;
+        --on-rose: #000000;
+        --rose-wash: #3d1424;
+        --separator: #38383a;
+        --phase-period: #6e2b3d;
+        --phase-follicular: #2a4a31;
+        --phase-ovulation: #24415f;
+        --phase-luteal: #5b4822;
+      }
+    }
+    @media (prefers-contrast: more) {
+      :root { --ink: #000000; --slate: #3a3a3c; --rose: #a61e4d; }
+    }
+    @media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+      :root { --ink: #ffffff; --slate: #c7c7cc; --rose: #ff8fb1; }
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--ink);
+      font: 17px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 16px 56px;
+    }
+    a { color: var(--rose); text-underline-offset: 2px; }
+    a:focus-visible { outline: 2.5px solid var(--rose); outline-offset: 3px; border-radius: 4px; }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      color: var(--rose);
+      font-weight: 600;
+    }
+    .brand svg { flex: none; }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+      align-items: center;
+      padding: 48px 0 56px;
+    }
+    @media (min-width: 800px) {
+      .hero { grid-template-columns: minmax(0, 1fr) 380px; gap: 56px; padding: 72px 0 80px; }
+    }
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1.08;
+      font-weight: 700;
+    }
+    h1 span { color: var(--rose); }
+    .sub {
+      margin: 0 0 28px;
+      max-width: 34em;
+      color: var(--slate);
+      font-size: 19px;
+      line-height: 1.5;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .button.primary { background: var(--rose); color: var(--on-rose); }
+    .button.secondary { background: var(--card); color: var(--rose); }
+    .button:active { opacity: 0.7; }
+    .note { margin: 12px 0 0; color: var(--slate); font-size: 13px; }
+
+    /* Calendar illustration */
+    .phone {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 20px 16px 16px;
+      max-width: 380px;
+      width: 100%;
+      justify-self: center;
+    }
+    @media (max-width: 360px) {
+      .phone { padding: 16px 10px 10px; border-radius: 22px; }
+      .month { padding: 12px 6px 8px; }
+      .d { font-size: 13px; }
+    }
+    .status { margin: 0 4px 2px; font-size: 24px; font-weight: 700; line-height: 1.2; }
+    .status-sub { margin: 0 4px 16px; color: var(--slate); font-size: 13px; }
+    .month {
+      background: var(--canvas);
+      border-radius: 16px;
+      padding: 14px 10px 10px;
+    }
+    .month-title { margin: 0 6px 8px; font-size: 15px; font-weight: 600; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      column-gap: 2px;
+      row-gap: 4px;
+      text-align: center;
+    }
+    .wd { color: var(--slate); font-size: 11px; padding-bottom: 4px; }
+    .d {
+      position: relative;
+      justify-self: center;
+      width: 100%;
+      max-width: 38px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      padding-bottom: 6px;
+    }
+    .d::after {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 7px;
+      line-height: 1;
+    }
+    .d.logged { background: var(--rose); color: var(--on-rose); font-weight: 700; }
+    .d.logged::after { content: "●"; }
+    .d.fol { background: var(--phase-follicular); }
+    .d.fol::after { content: "▬"; }
+    .d.ovu { background: var(--phase-ovulation); }
+    .d.ovu::after { content: "◆"; }
+    .d.lut { background: var(--phase-luteal); }
+    .d.lut::after { content: "■"; }
+    .d.next { background: var(--phase-period); }
+    .d.next::after { content: "○"; }
+    .d.today { box-shadow: inset 0 0 0 1.5px var(--ink); font-weight: 700; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      margin: 12px 6px 0;
+      padding: 0;
+      list-style: none;
+      color: var(--slate);
+      font-size: 12px;
+    }
+    .legend li { display: flex; align-items: center; gap: 6px; }
+    .sw { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+    /* Features */
+    .section-title { margin: 0 0 16px; font-size: 22px; font-weight: 700; }
+    .features {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 12px;
+    }
+    @media (min-width: 640px) { .features { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 900px) { .features { grid-template-columns: repeat(3, 1fr); } }
+    .features li {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--rose-wash);
+      color: var(--rose);
+      display: grid;
+      place-items: center;
+      margin-bottom: 12px;
+    }
+    .features h3 { margin: 0 0 4px; font-size: 17px; font-weight: 600; }
+    .features p { margin: 0; color: var(--slate); font-size: 15px; }
+
+    /* Privacy band */
+    .privacy {
+      margin: 56px 0 0;
+      background: var(--rose-wash);
+      border-radius: 16px;
+      padding: 28px 24px;
+      display: grid;
+      gap: 16px;
+      align-items: center;
+    }
+    @media (min-width: 720px) { .privacy { grid-template-columns: 1fr auto; padding: 32px; } }
+    .privacy h2 { margin: 0 0 6px; font-size: 22px; font-weight: 700; }
+    .privacy p { margin: 0; font-size: 15px; }
+
+    footer {
+      margin-top: 56px;
+      padding-top: 20px;
+      border-top: 1px solid var(--separator);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      justify-content: space-between;
+      color: var(--slate);
+      font-size: 13px;
+    }
+    footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+    footer a { color: var(--slate); }
+    .disclaimer { flex-basis: 100%; margin: 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="brand">
+        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+          <circle cx="14" cy="14" r="14" fill="currentColor"/>
+        </svg>
+        MYperiod.
+      </p>
+    </header>
+
+    <section class="hero">
+      <div>
+        <h1>Your cycle, on your phone. <span>Nowhere else.</span></h1>
+        <p class="sub">MYperiod is a free, private period tracker for iPhone. Log your period days and see the weeks ahead on a calm, simple calendar. No accounts, no analytics, no tracking.</p>
+        <div class="actions">
+          <a class="button primary" href="mailto:support@royalsoftworks.com.au">Get in touch</a>
+          <a class="button secondary" href="myperiod/privacy-policy/">Privacy policy</a>
+        </div>
+        <p class="note">Coming soon to the App Store.</p>
+      </div>
+
+      <div class="phone" aria-hidden="true">
+        <p class="status">Period in 9 days</p>
+        <p class="status-sub">Cycle day 20 · Luteal phase</p>
+        <div class="month">
+          <p class="month-title">October 2026</p>
+          <div class="grid">
+            <span class="wd">S</span><span class="wd">M</span><span class="wd">T</span><span class="wd">W</span><span class="wd">T</span><span class="wd">F</span><span class="wd">S</span>
+            <span></span><span></span><span></span><span></span>
+            <span class="d logged">1</span><span class="d logged">2</span><span class="d logged">3</span>
+            <span class="d logged">4</span><span class="d logged">5</span><span class="d fol">6</span><span class="d fol">7</span><span class="d fol">8</span><span class="d fol">9</span><span class="d fol">10</span>
+            <span class="d fol">11</span><span class="d fol">12</span><span class="d ovu">13</span><span class="d ovu">14</span><span class="d ovu">15</span><span class="d ovu">16</span><span class="d lut">17</span>
+            <span class="d lut">18</span><span class="d lut">19</span><span class="d lut today">20</span><span class="d lut">21</span><span class="d lut">22</span><span class="d lut">23</span><span class="d lut">24</span>
+            <span class="d lut">25</span><span class="d lut">26</span><span class="d lut">27</span><span class="d lut">28</span><span class="d next">29</span><span class="d next">30</span><span class="d next">31</span>
+          </div>
+          <ul class="legend">
+            <li><span class="sw" style="background:var(--rose)"></span>● Logged</li>
+            <li><span class="sw" style="background:var(--phase-period)"></span>○ Period</li>
+            <li><span class="sw" style="background:var(--phase-follicular)"></span>▬ Follicular</li>
+            <li><span class="sw" style="background:var(--phase-ovulation)"></span>◆ Ovulation</li>
+            <li><span class="sw" style="background:var(--phase-luteal)"></span>■ Luteal</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="features-title">
+      <h2 id="features-title" class="section-title">Simple by design</h2>
+      <ul class="features">
+        <li>
+          <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10V8a6 6 0 0 1 12 0v2M5 10h14v10H5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
+          <h3>Private by default</h3>
+          <p>Your data stays on your iPhone. It isn’t sent to us, and it’s left out of iCloud and computer backups.</p>
+        </li>
+        <li>
+          <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+          <h3>See what’s ahead</h3>
+          <p>Predicted periods, fertile window, ovulation and each cycle phase, worked out on your device from the days you log.</p>
+        </li>
+        <li>
+          <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <h3>Optional passcode</h3>
+          <p>Encrypt your data with a passcode of your own, so it can’t be read even when your phone is unlocked.</p>
+        </li>
+        <li>
+          <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h4v4H4zM10 5h4v4h-4zM16 5h4v4h-4zM4 11h4v4H4zM10 11h4v4h-4zM16 11h4v4h-4zM4 17h4v2H4zM10 17h4v2h-4z" fill="currentColor"/></svg></div>
+          <h3>Your whole year</h3>
+          <p>Pinch out to see twelve months at a glance, with past and predicted periods marked.</p>
+        </li>
+        <li>
+          <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+          <h3>20 languages</h3>
+          <p>Follows your iPhone’s language, with support for VoiceOver, larger text and right-to-left layouts.</p>
+        </li>
+        <li>
+          <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z" fill="currentColor"/></svg></div>
+          <h3>Free, always</h3>
+          <p>Every feature is free. There are no ads or subscriptions, just an optional tip if you’d like to say thanks.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="privacy" aria-labelledby="privacy-title">
+      <div>
+        <h2 id="privacy-title">Your data stays on your device</h2>
+        <p>No accounts, no analytics, no advertising and no tracking. Read exactly how MYperiod handles information.</p>
+      </div>
+      <a class="button primary" href="myperiod/privacy-policy/">Read the privacy policy</a>
+    </section>
+
+    <footer>
+      <span>© 2026 RoyalSoftworks</span>
+      <nav aria-label="Footer">
+        <a href="myperiod/privacy-policy/">Privacy policy</a>
+        <a href="mailto:support@royalsoftworks.com.au">support@royalsoftworks.com.au</a>
+      </nav>
+      <p class="disclaimer">Predictions are estimates. MYperiod is not a medical device or a contraceptive.</p>
+    </footer>
+  </main>
+</body>
+</html>
